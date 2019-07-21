@@ -1,4 +1,4 @@
-import time
+import timeit
 
 import numpy as np
 from numba import jit
@@ -51,18 +51,14 @@ def print_result(output):
 def evaluate(funct, width, height, maxVal, centerXY, rangeXY, repeat):
     output = np.ndarray((height, width), dtype=np.int32)
 
-    # Warm-up
-    funct(output, maxVal, centerXY, rangeXY)
-
-    start = time.perf_counter()
-
-    for i in range(repeat):
+    def run():
         funct(output, maxVal, centerXY, rangeXY)
 
-    end = time.perf_counter()
-    runtime = 1000 * (end - start) / repeat
+    timer = timeit.Timer(stmt=run, setup=run)
+    runtime = min(timer.repeat(number=repeat))
+    ms_mean = 1000 * runtime / repeat
 
-    return output, runtime
+    return output, ms_mean
 
 
 if __name__ == "__main__":
