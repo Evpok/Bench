@@ -1,9 +1,11 @@
 import time
+
 import numpy as np
 from numba import jit
 
+import CMandelbrot
 
-@jit(nopython=True)
+
 def compute_mandelbrot(output, maxVal, centerXY, rangeXY):
     xMin = centerXY[0] - rangeXY[0] / 2
     xMax = centerXY[0] + rangeXY[0] / 2
@@ -22,6 +24,7 @@ def compute_mandelbrot(output, maxVal, centerXY, rangeXY):
             zIm = np.float32(0)
             zRe2 = np.float32(0)
             zIm2 = np.float32(0)
+            zReIm = np.float32(0)
             val = np.float32(0)
 
             while True:
@@ -30,7 +33,7 @@ def compute_mandelbrot(output, maxVal, centerXY, rangeXY):
                 zRe2 = zRe * zRe
                 zIm2 = zIm * zIm
 
-                if val >= maxVal or zIm2 + zRe2 >= 4:
+                if val >= maxVal or zIm2 + zRe2 >= 4.:
                     break
 
                 val += 1
@@ -43,7 +46,24 @@ def print_result(output):
     for y in range(output.shape[0]):
         for x in range(output.shape[1]):
             print(chr(32 + (output[y][x] & 63)), end="")
-        print("")
+        print()
+
+
+def evaluate(funct, width, height, maxVal, centerXY, rangeXY, repeat):
+    output = np.ndarray((height, width), dtype=np.int32)
+
+    # Warm-up
+    funct(output, maxVal, centerXY, rangeXY)
+
+    start = time.perf_counter()
+
+    for i in range(repeat):
+        funct(output, maxVal, centerXY, rangeXY)
+
+    end = time.perf_counter()
+    runtime = 1000 * (end - start) / repeat
+
+    return output, runtime
 
 
 if __name__ == "__main__":
@@ -51,18 +71,26 @@ if __name__ == "__main__":
     height = 25
     maxVal = 256
     repeat = 8
+    centerXY = (-0.5, 0)
+    rangeXY = (3, 2)
 
-    output = np.ndarray((height, width), dtype=np.int32)
+    testcases = (
+        (compute_mandelbrot, "Vanilla python"),
+        (jit(compute_mandelbrot, nopython=True), "Numba JIT"),
+        (CMandelbrot.compute_mandelbrot, "Cython"),
+    )
 
-    # Warm-up
-    compute_mandelbrot(output, maxVal, (-0.5, 0), (3, 2))
+    ref_output = np.ndarray((height, width), dtype=np.int32)
+    compute_mandelbrot(ref_output, maxVal, centerXY, rangeXY)
+    for funct, name in testcases:
+        output, runtime = evaluate(
+            funct, width, height, maxVal, centerXY, rangeXY, repeat
+        )
+        delta = np.abs(ref_output - output)
+        ndiff = np.count_nonzero(delta)
+        print(
+            f"{name}: {runtime}ms"
+            + (f", ndiff={ndiff}, max={delta.max()}" if ndiff else "")
+        )
+    # print_result(ref_output)
 
-    start = time.perf_counter()
-
-    for i in range(repeat):
-        compute_mandelbrot(output, maxVal, (-0.5, 0), (3, 2))
-
-    end = time.perf_counter()
-    print("Python: %g ms" % (1000 * (end - start) / repeat))
-
-    print_result(output)
