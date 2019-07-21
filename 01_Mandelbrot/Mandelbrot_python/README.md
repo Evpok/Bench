@@ -4,7 +4,7 @@
 2. install the requirements and build the extensions `pip install -e .`
 3. run the benchmark `python Mandelbrot.py`
 
-## Results
+## Results
 
 On my laptop
 
