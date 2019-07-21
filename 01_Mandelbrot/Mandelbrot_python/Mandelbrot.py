@@ -57,12 +57,12 @@ if __name__ == "__main__":
     # Warm-up
     compute_mandelbrot(output, maxVal, (-0.5, 0), (3, 2))
 
-    start = time.time()
+    start = time.perf_counter()
 
     for i in range(repeat):
         compute_mandelbrot(output, maxVal, (-0.5, 0), (3, 2))
 
-    end = time.time()
+    end = time.perf_counter()
     print("Python: %g ms" % (1000 * (end - start) / repeat))
 
     print_result(output)
