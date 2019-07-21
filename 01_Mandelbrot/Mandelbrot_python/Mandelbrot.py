@@ -72,7 +72,9 @@ if __name__ == "__main__":
     testcases = (
         (compute_mandelbrot, "Vanilla python"),
         (jit(compute_mandelbrot, nopython=True), "Numba JIT"),
-        (CMandelbrot.compute_mandelbrot, "Cython"),
+        (CMandelbrot.compute_mandelbrot_naive, "Cython (naive)"),
+        (CMandelbrot.compute_mandelbrot_optimized, "Cython (optimized)"),
+        (CMandelbrot.compute_mandelbrot_parallel, "Cython (parallel)"),
     )
 
     ref_output = np.ndarray((height, width), dtype=np.int32)
