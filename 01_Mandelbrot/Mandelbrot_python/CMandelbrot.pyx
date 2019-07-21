@@ -27,8 +27,8 @@ def compute_mandelbrot(int[:, :] output not None, int maxVal, (float, float) cen
     cdef float xMax = centerXY[0] + rangeXY[0] / 2
     cdef float yMin = centerXY[1] - rangeXY[1] / 2
     cdef float yMax = centerXY[1] + rangeXY[1] / 2
-    cdef double xVal = xMin  # Else we seem to get underflow?
-    cdef double yVal = yMin  # Else we seem to get underflow?
+    cdef float xVal = xMin
+    cdef float yVal = yMin
 
     cdef float xStep = (xMax - xMin) / (X - 1)
     cdef float yStep = (yMax - yMin) / (Y - 1)
@@ -36,7 +36,6 @@ def compute_mandelbrot(int[:, :] output not None, int maxVal, (float, float) cen
     cdef Py_ssize_t x, y
     for y in range(Y):
         yVal = y * yStep + yMin
-        xVal = xMin
         for x in range(X):
+            xVal = x*xStep + xMin
             output[y][x] = compute_single(xVal, yVal, maxVal)
-            xVal += xStep

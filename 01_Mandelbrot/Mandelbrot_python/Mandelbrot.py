@@ -17,9 +17,9 @@ def compute_mandelbrot(output, maxVal, centerXY, rangeXY):
 
     for y in range(output.shape[0]):
         yVal = np.float32(y * yStep + yMin)
-        xVal = np.float32(xMin)
 
         for x in range(output.shape[1]):
+            xVal = np.float32(x * xStep + xMin)
             zRe = np.float32(0)
             zIm = np.float32(0)
             zRe2 = np.float32(0)
@@ -33,13 +33,12 @@ def compute_mandelbrot(output, maxVal, centerXY, rangeXY):
                 zRe2 = zRe * zRe
                 zIm2 = zIm * zIm
 
-                if val >= maxVal or zIm2 + zRe2 >= 4.:
+                if val >= maxVal or zIm2 + zRe2 >= 4.0:
                     break
 
                 val += 1
 
             output[y][x] = val
-            xVal += xStep
 
 
 def print_result(output):
