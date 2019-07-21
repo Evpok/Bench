@@ -2,6 +2,7 @@ import time
 import numpy as np
 from numba import jit
 
+
 @jit(nopython=True)
 def compute_mandelbrot(output, maxVal, centerXY, rangeXY):
     xMin = centerXY[0] - rangeXY[0] / 2
@@ -13,12 +14,10 @@ def compute_mandelbrot(output, maxVal, centerXY, rangeXY):
     yStep = (yMax - yMin) / (output.shape[0] - 1)
 
     for y in range(output.shape[0]):
-
         yVal = np.float32(y * yStep + yMin)
         xVal = np.float32(xMin)
 
         for x in range(output.shape[1]):
-
             zRe = np.float32(0)
             zIm = np.float32(0)
             zRe2 = np.float32(0)
@@ -35,23 +34,17 @@ def compute_mandelbrot(output, maxVal, centerXY, rangeXY):
                     break
 
                 val += 1
-                pass
 
             output[y][x] = val
             xVal += xStep
 
-            pass
-        pass
-
-    pass
 
 def print_result(output):
     for y in range(output.shape[0]):
         for x in range(output.shape[1]):
-            print(chr(32 + (output[y][x] & 63)), end='')
-            pass
-        print('')
-        pass
+            print(chr(32 + (output[y][x] & 63)), end="")
+        print("")
+
 
 if __name__ == "__main__":
     width = 100
@@ -73,5 +66,3 @@ if __name__ == "__main__":
     print("Python: %g ms" % (1000 * (end - start) / repeat))
 
     print_result(output)
-    
-    pass
